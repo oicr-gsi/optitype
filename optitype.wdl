@@ -91,7 +91,7 @@ task optitype{
 	optitype -i ~{fastqR1} ~{fastqR2} -d -v -o . --prefix ~{prefix}
 	>>>
 	output {
-		File results = "~{prefix}_results.tsv"
+		File results = "~{prefix}_result.tsv"
 		File plot = "~{prefix}_coverage_plot.pdf"
  	}
 }
