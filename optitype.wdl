@@ -21,8 +21,8 @@ workflow optitype {
     
 	
 	Map[String,File] ref_fasta = {
-		"dna":"$OPTITYPE_ROOT/ref/hla_reference_dna.fasta",
-		"rna":"$OPTITYPE_ROOT/ref/hla_reference_rna.fasta"
+		"dna":"/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_dna.fasta",
+		"rna":"/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_rna.fasta"
 	}
 	
 	
@@ -80,7 +80,8 @@ workflow optitype {
 		input:
 		fastqR1 = concatR1.fastq,
 		fastqR2 = concatR2.fastq,
-		prefix = outputFileNamePrefix
+		prefix = outputFileNamePrefix,
+		libtype = libtype
 	}
 	output {
 		File optitypeResults = optitype.results
@@ -222,13 +223,14 @@ task optitype{
 		File fastqR1
 		File fastqR2
 		String prefix
+		String libtype
 		String modules = "optitype/1.3.1"
 		Int jobMemory = 16
 		Int timeout = 48
 	}
 	command <<<
 	module load optitype
-	optitype -i ~{fastqR1} ~{fastqR2} -d -v -o . --prefix ~{prefix}
+	optitype -i ~{fastqR1} ~{fastqR2} --~{libtype} -v -o . --prefix ~{prefix}
 	>>>
 	runtime {
 		modules: "~{modules}"
