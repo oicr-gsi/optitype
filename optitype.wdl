@@ -20,13 +20,9 @@ workflow optitype {
 	}
     
 	
-	Map[String,GenomeResources] resources = {
-		"dna": {
-			"ref_fasta":"$OPTITYPE_ROOT/ref/hla_reference_dna.fasta"
-		},
-		"rna": {
-			"ref_fasta":"$OPTITYPE_ROOT/ref/hla_reference_rna.fasta"
-		}
+	Map[String,File] ref_fasta = {
+		"dna":"$OPTITYPE_ROOT/ref/hla_reference_dna.fasta",
+		"rna":"$OPTITYPE_ROOT/ref/hla_reference_rna.fasta"
 	}
 	
 	
@@ -57,14 +53,14 @@ workflow optitype {
 		call HLAReads as HLAReadsR1{
 		    input:
 			fastq = fq1,
-			hlaref = resources [libtype].ref_fasta
+			hlaref = ref_fasta[libtype]
 		}
 	}	
 	scatter(fq2 in fastq2){
 		call HLAReads as HLAReadsR2{
 		    input:
 			fastq = fq2,
-			hlaref = resources [libtype].ref_fasta
+			hlaref = ref_fasta[libtype]
 		}
 	}	
 	
@@ -103,7 +99,7 @@ workflow optitype {
 			{
 				name: "razers3/3.5.8",
 				url: "http://packages.seqan.de/razers3/razers3-3.5.8-Linux-x86_64.tar.xz"
-			}
+			},
 			{
 				name: "slicer/0.3.0",
 				url: "https://github.com/OpenGene/slicer/archive/v0.3.0.tar.gz"
@@ -113,7 +109,7 @@ workflow optitype {
 			    url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
 			},
 			{
-				name: "gsi software module dependencies" : singularity/3.9.4 razers/3.5.8 samtools/1.16.1",
+				name: "gsi software module dependencies : singularity/3.9.4 razers/3.5.8 samtools/1.16.1",
 				url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
 			}
 		]
@@ -179,6 +175,7 @@ task slicer {
 			chunkFastq: "output fastq chunks"
 		}
 	}
+}
 task HLAReads{
 	input {
 		File fastq
@@ -244,7 +241,5 @@ task optitype{
  	}
 }
 
-
-} 
 
 
