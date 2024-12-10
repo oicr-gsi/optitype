@@ -7,4 +7,3 @@ cd $1
 
 ls | sed 's/.*\.//' | sort | uniq -c
 find . -name '*.tsv'  | xargs md5sum | sort
-find . -name '*.pdf'  | xargs md5sum | sort

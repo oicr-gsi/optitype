@@ -21,8 +21,8 @@ workflow optitype {
     
 	
 	Map[String,File] ref_fasta = {
-		"dna":"/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_dna.fasta",
-		"rna":"/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_rna.fasta"
+		"dna":"$HLA_REFERENCE_ROOT/hla_reference_dna",
+		"rna":"$HLA_REFERENCE_ROOT/hla_reference_rna"
 	}
 	
 	
@@ -199,7 +199,7 @@ task HLAReads{
 	input {
 		File fastq
 		File hlaref
-		String modules = "optitype/1.3.1"
+		String modules = "optitype/1.3.1 hla-reference/1.0.0"
 		Int jobMemory = 16
 		Int timeout = 48
 	}
