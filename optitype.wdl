@@ -6,7 +6,7 @@ workflow optitype {
 		File fastqR2
 		String outputFileNamePrefix
 		Int numChunks = 1
-		Int? numReads
+		Int numReads
 		String libtype
 	}
 
@@ -130,7 +130,7 @@ task countChunkSize{
 	input {
 		File fastqR1
 		Int numChunks
-		Int? numReads
+		Int numReads
 		String modules = "python/3.7"
 		Int jobMemory = 16
 		Int timeout = 48
@@ -146,7 +146,7 @@ task countChunkSize{
 	command <<<
 		set -euo pipefail
 
-		if [ -z "~{numReads}" ]; then
+		if [ "~{numReads}" -ne 0 ]; then
 		totalLines=$(zcat ~{fastqR1} | wc -l)
 		else totalLines=$((~{numReads}*4))
 		fi
