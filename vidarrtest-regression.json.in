@@ -1,0 +1,174 @@
+[
+    {
+        "arguments": {
+            "optitype.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/optitype/inputs/GSICAPBENCH_1390_Ly_R_PE_534_WG_hla_enriched_R1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "optitype.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/optitype/inputs/GSICAPBENCH_1390_Ly_R_PE_534_WG_hla_enriched_R1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "optitype.concatR1.jobMemory": 16,
+            "optitype.concatR1.timeout": 48,
+            "optitype.concatR2.jobMemory": 16,
+            "optitype.concatR2.timeout": 48,
+            "optitype.countChunkSize.jobMemory": 16,
+            "optitype.countChunkSize.modules": "python/3.7",
+            "optitype.countChunkSize.timeout": 48,
+            "optitype.HLAReadsR1.jobMemory": 16,
+            "optitype.HLAReadsR1.modules": "optitype/1.3.1",
+            "optitype.HLAReadsR1.timeout": 48,
+            "optitype.HLAReadsR2.jobMemory": 16,
+            "optitype.HLAReadsR2.modules": "optitype/1.3.1",
+            "optitype.HLAReadsR2.timeout": 48,
+            "optitype.libtype": "dna",
+            "optitype.numChunks": 1,
+            "optitype.numReads": "",
+            "optitype.outputFileNamePrefix": "String",
+            "optitype.run_optitype.jobMemory": 16,
+            "optitype.run_optitype.modules": "optitype/1.3.1",
+            "optitype.run_optitype.timeout": 48,
+            "optitype.slicerR1.jobMemory": 16,
+            "optitype.slicerR1.modules": "slicer/0.3.0",
+            "optitype.slicerR1.timeout": 48,
+            "optitype.slicerR2.jobMemory": 16,
+            "optitype.slicerR2.modules": "slicer/0.3.0",
+            "optitype.slicerR2.timeout": 48
+        },
+        "description": "optitype workflow test_WG",
+        "engineArguments": {
+           "write_to_cache": false,
+           "read_from_cache": false
+        },
+        "id": "optitype_test_WG",
+        "metadata": {
+            "optitype.optitypeResults": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_optitype_test_WG_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "optitype.optitypePlot": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_optitype_test_WG_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_expectation/optitype_test_WG.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "optitype.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/optitype/inputs/GSICAPBENCH_1390_Ln_M_PE_3381_WT_hla_enriched_R1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "optitype.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/optitype/inputs/GSICAPBENCH_1390_Ln_M_PE_3381_WT_hla_enriched_R2.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "optitype.concatR1.jobMemory": 16,
+            "optitype.concatR1.timeout": 48,
+            "optitype.concatR2.jobMemory": 16,
+            "optitype.concatR2.timeout": 48,
+            "optitype.countChunkSize.jobMemory": 16,
+            "optitype.countChunkSize.modules": "python/3.7",
+            "optitype.countChunkSize.timeout": 48,
+            "optitype.HLAReadsR1.jobMemory": 16,
+            "optitype.HLAReadsR1.modules": "optitype/1.3.1",
+            "optitype.HLAReadsR1.timeout": 48,
+            "optitype.HLAReadsR2.jobMemory": 16,
+            "optitype.HLAReadsR2.modules": "optitype/1.3.1",
+            "optitype.HLAReadsR2.timeout": 48,
+            "optitype.libtype": "rna",
+            "optitype.numChunks": 1,
+            "optitype.numReads": "",
+            "optitype.outputFileNamePrefix": "String",
+            "optitype.run_optitype.jobMemory": 16,
+            "optitype.run_optitype.modules": "optitype/1.3.1",
+            "optitype.run_optitype.timeout": 48,
+            "optitype.slicerR1.jobMemory": 16,
+            "optitype.slicerR1.modules": "slicer/0.3.0",
+            "optitype.slicerR1.timeout": 48,
+            "optitype.slicerR2.jobMemory": 16,
+            "optitype.slicerR2.modules": "slicer/0.3.0",
+            "optitype.slicerR2.timeout": 48
+        },
+        "description": "optitype workflow test_WT",
+        "engineArguments": {
+           "write_to_cache": false,
+           "read_from_cache": false
+        },
+        "id": "optitype_test_WT",
+        "metadata": {
+            "optitype.optitypeResults": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_optitype_test_WT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "optitype.optitypePlot": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_optitype_test_WT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_expectation/optitype_test_WT.metrics",
+                "type": "script"
+            }
+        ]
+    }
+]
