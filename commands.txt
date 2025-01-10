@@ -1,0 +1,33 @@
+## Commands
+ This section lists command(s) run by Optitype workflow
+ 
+ * Running Optitype
+ 
+ 
+ ```
+ 		set -euo pipefail
+ 
+ 		if [ -z "~{numReads}" ]; then
+ 		totalLines=$(zcat ~{fastqR1} | wc -l)
+ 		else totalLines=$((~{numReads}*4))
+ 		fi
+ 		python3 -c "from math import ceil; print (int(ceil(($totalLines/4.0)/~{numChunks})*4))"
+```
+```
+ 		set -euo pipefail
+ 		module load slicer/0.3.0
+ 		slicer -i ~{fastqR} -l ~{chunkSize} --gzip 
+```
+```
+ 		set -euo pipefail
+ 		razers3 -i 95 -m 1 -dr 0 -o HLA.bam ~{hlaref} ~{fastq}
+ 		samtools bam2fq HLA.bam > HLA.fastq	  
+```
+```
+ 		set -euo pipefail
+ 		cat ~{sep=" " fastq} > hlareads.fastq
+```
+```
+		module load optitype
+		optitype -i ~{fastqR1} ~{fastqR2} --~{libtype} -v -o . --prefix ~{prefix}
+```

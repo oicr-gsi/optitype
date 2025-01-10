@@ -6,7 +6,7 @@ workflow optitype {
 		File fastqR2
 		String outputFileNamePrefix
 		Int numChunks = 1
-		Int? numReads
+		Int numReads
 		String libtype
 	}
 
@@ -14,7 +14,7 @@ workflow optitype {
 		fastqR1: "Fastq file for read 1"
 		fastqR2: "Fastq file for read 2"
 		outputFileNamePrefix: "Prefix for output files"
-		numChunk: "Number of chunks to split fastq file [1, no splitting]"
+		numChunks: "Number of chunks to split fastq file [1, no splitting]"
 		numReads: "Number of reads"
 		libtype: "the type of library, which will determine the hla reference to use.  dna|rna"
 	}
@@ -76,16 +76,16 @@ workflow optitype {
 		fastq=hlafastq2
 	}
 	
-	call optitype{
+	call run_optitype{
 		input:
-		fastqR1 = concatR1.fastq,
-		fastqR2 = concatR2.fastq,
+		fastqR1 = concatR1.concatenated_fastq,
+		fastqR2 = concatR2.concatenated_fastq,
 		prefix = outputFileNamePrefix,
 		libtype = libtype
 	}
 	output {
-		File optitypeResults = optitype.results
-		File optitypePlot = optitype.plot
+		File optitypeResults = run_optitype.results
+		File optitypePlot = run_optitype.plot
     }
 	
 	meta {
@@ -114,21 +114,39 @@ workflow optitype {
 				url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
 			}
 		]
+		output_meta: {
+			optitypeResults: {
+				description: "Results of optitype",
+				vidarr_label: "optitypeResults"
+			},
+			optitypePlot: {
+				description: "Plots of optitype",
+				vidarr_label: "optitypePlot"
+			}
+		}
 	}
 }
 task countChunkSize{
 	input {
 		File fastqR1
 		Int numChunks
-		Int? numReads
+		Int numReads
 		String modules = "python/3.7"
 		Int jobMemory = 16
 		Int timeout = 48
 	}
+	parameter_meta {
+		fastqR1: "input fatsq file"
+		numChunks: " number of chunks"
+		numReads: "number of reads"
+		modules: "name and version of modules"
+		jobMemory: "Memory allocated for this job"
+		timeout: "Hours before task timeout"
+	}
 	command <<<
 		set -euo pipefail
 
-		if [ -z "~{numReads}" ]; then
+		if [ "~{numReads}" -ne 0 ]; then
 		totalLines=$(zcat ~{fastqR1} | wc -l)
 		else totalLines=$((~{numReads}*4))
 		fi
@@ -181,9 +199,16 @@ task HLAReads{
 	input {
 		File fastq
 		File hlaref
-		String modules = "optitype/1.3.1"
+		String modules = "optitype/1.3.1 hla-reference/1.0.0"
 		Int jobMemory = 16
 		Int timeout = 48
+	}
+	parameter_meta {
+		fastq: "Fastq file"
+		hlaref: "hla reference file"
+		modules: "Required environment modules"
+		jobMemory: "Memory allocated for this job"
+		timeout: "Hours before task timeout"
 	}
 	command <<<
 		set -euo pipefail
@@ -205,6 +230,11 @@ task concatReads{
 		Int jobMemory = 16
 		Int timeout = 48
 	}
+	parameter_meta {
+		fastq: "Array of input fastq files"
+		jobMemory: "Memory allocated for this job"
+		timeout: "Hours before task timeout"
+	}
 	command <<<
 		set -euo pipefail
 		cat ~{sep=" " fastq} > hlareads.fastq
@@ -215,10 +245,10 @@ task concatReads{
 		timeout: "~{timeout}"
 	}
 	output {
-		File fastq = "hlareads.fastq"
+		File concatenated_fastq = "hlareads.fastq"
 	}
 }
-task optitype{
+task run_optitype{
 	input{
 		File fastqR1
 		File fastqR2
@@ -227,6 +257,14 @@ task optitype{
 		String modules = "optitype/1.3.1"
 		Int jobMemory = 16
 		Int timeout = 48
+	}
+	parameter_meta {
+		fastqR1: "Fastq file 1ead1"
+		fastqR2: "Fastq file read2"
+		prefix: "Prefix for output files"
+		modules: "Required environment modules"
+		jobMemory: "Memory allocated for this job"
+		timeout: "Hours before task timeout"
 	}
 	command <<<
 	module load optitype
