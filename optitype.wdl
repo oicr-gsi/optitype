@@ -130,7 +130,7 @@ task countChunkSize{
 	input {
 		File fastqR1
 		Int numChunks
-		Int numReads
+		Int ?numReads
 		String modules = "python/3.7"
 		Int jobMemory = 16
 		Int timeout = 48
@@ -145,9 +145,8 @@ task countChunkSize{
 	}
 	command <<<
 		set -euo pipefail
-
-		if [ "~{numReads}" -ne 0 ]; then
-		totalLines=$(zcat ~{fastqR1} | wc -l)
+		if [ -z "~{numReads}" ]; then
+			totalLines=$(zcat ~{fastqR1} | wc -l)
 		else totalLines=$((~{numReads}*4))
 		fi
 		python3 -c "from math import ceil; print (int(ceil(($totalLines/4.0)/~{numChunks})*4))"
