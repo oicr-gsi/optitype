@@ -6,7 +6,7 @@ workflow optitype {
 		File fastqR2
 		String outputFileNamePrefix
 		Int numChunks = 1
-		Int numReads
+		Int? numReads
 		String libtype
 	}
 
