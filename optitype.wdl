@@ -2,8 +2,8 @@ version 1.0
 
 workflow optitype {
 	input {
-		File fastqR1
-		File fastqR2
+		Array[File] fastqR1
+		Array[File] fastqR2
 		String outputFileNamePrefix
 		Int numChunks = 1
 		Int? numReads
@@ -11,8 +11,8 @@ workflow optitype {
 	}
 
 	parameter_meta {
-		fastqR1: "Fastq file for read 1"
-		fastqR2: "Fastq file for read 2"
+		fastqR1: "Array or single of Fastq files for read 1"
+		fastqR2: "Array or single of Fastq files for read 2"
 		outputFileNamePrefix: "Prefix for output files"
 		numChunks: "Number of chunks to split fastq file [1, no splitting]"
 		numReads: "Number of reads"
@@ -25,29 +25,35 @@ workflow optitype {
 		"rna":"/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_rna.fasta"
 	}
 	
+	### concatenating raw files
+	call concatRawReads {
+  		input:
+    		fastqR1 = fastqR1,
+    		fastqR2 = fastqR2
+	}
 	
 	### if this is greater than 1, then the fastq files will be split to chunks and
 	if (numChunks > 1) {
 		call countChunkSize {
 			input:
-			fastqR1 = fastqR1,
+			fastqR1 = concatRawReads.raw_concatenated_fastqR1,
 			numChunks = numChunks,
 			numReads = numReads
 		}
 		call slicer as slicerR1{
 			input:
-			fastqR = fastqR1,
+			fastqR = concatRawReads.raw_concatenated_fastqR1,
 			chunkSize = countChunkSize.chunkSize
 		}
 		call slicer as slicerR2 {
 			input:
-			fastqR = fastqR2,
+			fastqR = concatRawReads.raw_concatenated_fastqR2,
 			chunkSize = countChunkSize.chunkSize
 		}
 	}
 
-	Array[File] fastq1 = select_first([slicerR1.chunkFastq, [fastqR1]])
-	Array[File] fastq2 = select_first([slicerR2.chunkFastq, [fastqR2]])
+	Array[File] fastq1 = select_first([slicerR1.chunkFastq, [concatRawReads.raw_concatenated_fastqR1]])
+	Array[File] fastq2 = select_first([slicerR2.chunkFastq, [concatRawReads.raw_concatenated_fastqR2]])
     
 	scatter(fq1 in fastq1){
 		call HLAReads as HLAReadsR1{
@@ -89,8 +95,8 @@ workflow optitype {
     }
 	
 	meta {
-		author: "Lawrence Heisler"
-		email: "lheisler@oicr.on.ca"
+		author: "Lawrence Heisler, Monica L. Rojas-Pena"
+		email: "lheisler@oicr.on.ca, mrojaspena@oicr.on.ca"
 		description: "OptiType does HLA genotyping producing 4-digit HLA genotyping predictions from NGS data and selects major/minor HLA Class I alleles. The workflow pre-filters input fastq reads by aligning to and HLA fasta reference based on library type (dna|rna) using RazerS3, as suggested in the tool documentation."
 		dependencies: [
 			{
@@ -126,6 +132,33 @@ workflow optitype {
 		}
 	}
 }
+
+# Task to concatenate raw fastq files before chunking
+task concatRawReads {
+  input {
+    Array[File] fastqR1
+    Array[File] fastqR2
+    Int jobMemory = 16
+    Int timeout = 48
+  }
+
+  command <<<
+    set -euo pipefail
+    zcat ~{sep=" " fastqR1} | gzip > raw_concat_R1.fastq.gz
+    zcat ~{sep=" " fastqR2} | gzip > raw_concat_R2.fastq.gz
+  >>>
+
+  runtime {
+    memory: "~{jobMemory} GB"
+    timeout: "~{timeout}"
+  }
+
+  output {
+    File raw_concatenated_fastqR1 = "raw_concat_R1.fastq.gz"
+    File raw_concatenated_fastqR2 = "raw_concat_R2.fastq.gz"
+  }
+}
+
 task countChunkSize{
 	input {
 		File fastqR1
@@ -279,6 +312,3 @@ task run_optitype{
 		File plot = "~{prefix}_coverage_plot.pdf"
  	}
 }
-
-
-
