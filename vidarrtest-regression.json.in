@@ -29,6 +29,8 @@
           "type": "EXTERNAL"
         }
       ],
+      "optitype.concatRawReads.jobMemory": 16,
+      "optitype.concatRawReads.timeout": 48,
       "optitype.concatR1.jobMemory": 16,
       "optitype.concatR1.timeout": 48,
       "optitype.concatR2.jobMemory": 16,
@@ -119,6 +121,8 @@
           "type": "EXTERNAL"
         }
       ],
+      "optitype.concatRawReads.jobMemory": 16,
+      "optitype.concatRawReads.timeout": 48,
       "optitype.concatR1.jobMemory": 16,
       "optitype.concatR1.timeout": 48,
       "optitype.concatR2.jobMemory": 16,
