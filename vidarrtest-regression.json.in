@@ -72,7 +72,7 @@
     "arguments": {
       "optitype.bam": {
         "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam",
+          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.Aligned.sortedByCoord.out.bam",
           "externalIds": [
             {
               "id": "TEST",
@@ -84,7 +84,7 @@
       },
       "optitype.bai": {
         "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam.bai",
+          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.Aligned.sortedByCoord.out.bai",
           "externalIds": [
             {
               "id": "TEST",
