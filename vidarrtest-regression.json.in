@@ -29,11 +29,14 @@
       "optitype.outputFileNamePrefix": "CHUM_Test01",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
       "optitype.extract_chr6_HLA_region.timeout": 48,
+      "optitype.extract_chr6_HLA_region.modules": "samtools/1.9",
       "optitype.HLAReads.jobMemory": 24,
       "optitype.HLAReads.timeout": 72,
       "optitype.HLAReads.threads": 8,
+      "optitype.HLAReads.modules": "optitype/1.3.1 hla-reference/1.0.0",
       "optitype.run_optitype.jobMemory": 16,
-      "optitype.run_optitype.timeout": 48
+      "optitype.run_optitype.timeout": 48,
+      "optitype.run_optitype.modules": "optitype/1.3.1"
     },
     "description": "optitype workflow test_WG (v2.0.0)",
     "engineArguments": {
@@ -98,11 +101,14 @@
       "optitype.outputFileNamePrefix": "CHUM_Test02",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
       "optitype.extract_chr6_HLA_region.timeout": 48,
+      "optitype.extract_chr6_HLA_region.modules": "samtools/1.9",
       "optitype.HLAReads.jobMemory": 24,
       "optitype.HLAReads.timeout": 72,
       "optitype.HLAReads.threads": 8,
+      "optitype.HLAReads.modules": "optitype/1.3.1 hla-reference/1.0.0",
       "optitype.run_optitype.jobMemory": 16,
-      "optitype.run_optitype.timeout": 48
+      "optitype.run_optitype.timeout": 48,
+      "optitype.run_optitype.modules": "optitype/1.3.1"
     },
     "description": "optitype workflow test_WT (v2.0.0)",
     "engineArguments": {
