@@ -26,7 +26,7 @@
         "type": "EXTERNAL"
       },
       "optitype.libtype": "dna",
-      "optitype.outputFileNamePrefix": "GSICAPBENCH_Test01",
+      "optitype.outputFileNamePrefix": "CHUM_Test01",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
       "optitype.extract_chr6_HLA_region.timeout": 48,
       "optitype.HLAReads.jobMemory": 24,
@@ -72,7 +72,7 @@
     "arguments": {
       "optitype.bam": {
         "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.Aligned.sortedByCoord.out.bam",
+          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam",
           "externalIds": [
             {
               "id": "TEST",
@@ -84,7 +84,7 @@
       },
       "optitype.bai": {
         "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.Aligned.sortedByCoord.out.bai",
+          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam.bai",
           "externalIds": [
             {
               "id": "TEST",
@@ -95,7 +95,7 @@
         "type": "EXTERNAL"
       },
       "optitype.libtype": "rna",
-      "optitype.outputFileNamePrefix": "GSICAPBENCH_Test02",
+      "optitype.outputFileNamePrefix": "CHUM_Test02",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
       "optitype.extract_chr6_HLA_region.timeout": 48,
       "optitype.HLAReads.jobMemory": 24,
