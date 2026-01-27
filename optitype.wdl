@@ -132,6 +132,12 @@ task extract_chr6_HLA_region {
           chr6_KI270802v1_alt chr6_KQ090017v1_alt > chr6_alt_$i.bam
 
      # Conditionally extract unmapped reads if libtype is 'rna'
+      # Note:
+        # Unmapped reads are included only for RNA-seq inputs to mitigate the
+        # systematic loss of HLA reads during initial genome alignment due to extreme polymorphism and multi-mapping.
+        # OptiType performs HLA-aware realignment, making these reads informative
+        # for RNA but unnecessary and potentially noisy for DNA inputs.
+
       if [ "~{libtype}" == "rna" ]; then
           samtools view -h -b -f 4 "${bams[$i]}" > unmapped_$i.bam
           samtools merge chr6_filtered_$i.bam chr6_region_$i.bam chr6_alt_$i.bam unmapped_$i.bam
