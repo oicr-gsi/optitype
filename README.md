@@ -25,8 +25,8 @@ java -jar cromwell.jar run optitype.wdl --inputs inputs.json
 #### Required workflow parameters:
 Parameter|Value|Description
 ---|---|---
-`bam`|File|Input BAM file containing aligned reads
-`bai`|File|Index file for BAM
+`bam`|Array[File]|One or more BAM files for a single sample
+`bai`|Array[File]|BAM index files (same order as bam)
 `outputFileNamePrefix`|String|Prefix for output files
 `libtype`|String|Library type determining HLA reference to use (dna|rna)
 
@@ -59,39 +59,86 @@ Output | Type | Description | Labels
 `optitypePlot`|File|Plots of optitype|vidarr_label: optitypePlot
 
 
-./commands.txt found, printing out the content...
 ## Commands
   This section lists command(s) run by Optitype workflow
   
   * Running Optitype
-  
-  
+ 
   ```
-                set -euo pipefail
-  
-                if [ -z "~{numReads}" ]; then
-                totalLines=$(zcat ~{fastqR1} | wc -l)
-                else totalLines=$((~{numReads}*4))
-                fi
-                python3 -c "from math import ceil; print (int(ceil(($totalLines/4.0)/~{numChunks})*4))"
+   set -euo pipefail
+   module load ~{modules}
+ 
+   # Convert input Array[File] to bash arrays
+   bams=(~{sep=' ' bam})
+   bais=(~{sep=' ' bai})
+ 
+   # Initialize array to store per-BAM filtered BAMs
+   chr6_bams=()
+ 
+   # Loop over each BAM
+   for i in $(seq 0 $((${#bams[@]}-1))); do
+       # Extract chr6 main region
+      samtools view -b "${bams[$i]}" chr6:29677984-33485635 > chr6_region_$i.bam
+ 
+       # Extract chr6 alt contigs
+       samtools view -b "${bams[$i]}" \
+           chr6_GL000250v2_alt chr6_GL000251v2_alt chr6_GL000252v2_alt \
+           chr6_GL000253v2_alt chr6_GL000254v2_alt chr6_GL000255v2_alt \
+           chr6_GL000256v2_alt chr6_GL383533v1_alt chr6_KB021644v2_alt \
+           chr6_KI270758v1_alt chr6_KI270797v1_alt chr6_KI270798v1_alt \
+           chr6_KI270799v1_alt chr6_KI270800v1_alt chr6_KI270801v1_alt \
+           chr6_KI270802v1_alt chr6_KQ090017v1_alt > chr6_alt_$i.bam
+ 
+      # Conditionally extract unmapped reads if libtype is 'rna'
+ 
+         # Note:
+         # Unmapped reads are included only for RNA-seq inputs to mitigate the
+         # systematic loss of HLA reads during initial genome alignment due to extreme polymorphism and multi-mapping.
+         # OptiType performs HLA-aware realignment, making these reads informative
+         # for RNA but unnecessary and potentially noisy for DNA inputs.
+ 
+       if [ "~{libtype}" == "rna" ]; then
+           samtools view -h -b -f 4 "${bams[$i]}" > unmapped_$i.bam
+           samtools merge chr6_filtered_$i.bam chr6_region_$i.bam chr6_alt_$i.bam unmapped_$i.bam
+       else
+           samtools merge chr6_filtered_$i.bam chr6_region_$i.bam chr6_alt_$i.bam
+       fi
+ 
+       # Add to array
+       chr6_bams+=("chr6_filtered_$i.bam")
+   done
+ 
+   # Merge all filtered BAMs if more than one
+   if [ ${#chr6_bams[@]} -gt 1 ]; then
+       samtools merge -@ 8 chr6_merged.bam "${chr6_bams[@]}"
+      samtools index -@ 8 chr6_merged.bam
+   else
+       cp "${chr6_bams[0]}" chr6_merged.bam
+      samtools index -@ 8 chr6_merged.bam
+   fi
+ 
+   # Sort by read name and convert to FASTQ
+   samtools sort -n -o chr6_merged.sorted.bam chr6_merged.bam
+ 
+   # Convert to paired FASTQ files
+   samtools fastq -1 chr6_R1.fastq -2 chr6_R2.fastq -0 /dev/null -s /dev/null -n chr6_merged.sorted.bam
+ 
+   # gzip fastq files
+   gzip -c chr6_R1.fastq > chr6_R1.fastq.gz
+   gzip -c chr6_R2.fastq > chr6_R2.fastq.gz
  ```
  ```
-                set -euo pipefail
-                module load slicer/0.3.0
-                slicer -i ~{fastqR} -l ~{chunkSize} --gzip 
+  	set -euo pipefail
+     echo "Starting razers3 at $(date)"
+     razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
+     razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
+     echo "razers3 finished at $(date)"
+     samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
+     samtools bam2fq HLA2_R2.bam > HLA_R2.fastq 
  ```
  ```
-                set -euo pipefail
-                razers3 -i 95 -m 1 -dr 0 -o HLA.bam ~{hlaref} ~{fastq}
-                samtools bam2fq HLA.bam > HLA.fastq       
- ```
- ```
-                set -euo pipefail
-                cat ~{sep=" " fastq} > hlareads.fastq
- ```
- ```
-                module load optitype
-                optitype -i ~{fastqR1} ~{fastqR2} --~{libtype} -v -o . --prefix ~{prefix}
+     module load ~{modules}
+     optitype -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}	  
  ``` ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
