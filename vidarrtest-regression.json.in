@@ -1,30 +1,28 @@
 [
   {
     "arguments": {
-      "optitype.bam": {
-        "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test01.bam",
-          "externalIds": [
-            {
-              "id": "TEST",
-              "provider": "TEST"
-            }
-          ]
-        },
-        "type": "EXTERNAL"
-      },
-      "optitype.bai": {
-        "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test01.bam.bai",
-          "externalIds": [
-            {
-              "id": "TEST",
-              "provider": "TEST"
-            }
-          ]
-        },
-        "type": "EXTERNAL"
-      },
+      "optitype.bam": [
+        {
+         "contents": {
+           "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test01.bam",
+           "externalIds": [
+             {"id": "TEST", "provider": "TEST"}
+           ]
+         },
+         "type": "EXTERNAL"
+        }
+      ],
+      "optitype.bai": [
+        {
+          "contents": {
+            "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test01.bam.bai",
+            "externalIds": [
+              {"id": "TEST", "provider": "TEST"}
+            ]
+          },
+          "type": "EXTERNAL"
+        }
+      ],
       "optitype.libtype": "dna",
       "optitype.outputFileNamePrefix": "CHUM_Test01",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
@@ -73,30 +71,28 @@
   },
   {
     "arguments": {
-      "optitype.bam": {
-        "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam",
-          "externalIds": [
-            {
-              "id": "TEST",
-              "provider": "TEST"
-            }
-          ]
-        },
-        "type": "EXTERNAL"
-      },
-      "optitype.bai": {
-        "contents": {
-          "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam.bai",
-          "externalIds": [
-            {
-              "id": "TEST",
-              "provider": "TEST"
-            }
-          ]
-        },
-        "type": "EXTERNAL"
-      },
+      "optitype.bam": [
+        {
+         "contents": {
+           "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam",
+           "externalIds": [
+             { "id": "TEST", "provider": "TEST" }
+            ]
+          },
+          "type": "EXTERNAL"
+        }
+      ],
+      "optitype.bai": [
+        {
+          "contents": {
+            "configuration": "/.mounts/labs/gsi/testdata/optitype/test_inputs/Test02.bam.bai",
+            "externalIds": [
+              { "id": "TEST", "provider": "TEST" }
+            ]
+          },
+         "type": "EXTERNAL"
+        }
+      ],
       "optitype.libtype": "rna",
       "optitype.outputFileNamePrefix": "CHUM_Test02",
       "optitype.extract_chr6_HLA_region.jobMemory": 16,
@@ -138,7 +134,7 @@
       {
         "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
         "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.0.0/workflow_test_02.metrics",
+        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.1.0/workflow_test_02.metrics",
         "type": "script"
       }
     ]
