@@ -2,15 +2,15 @@ version 1.0
 
 workflow optitype {
   input {
-    File bam
-    File bai
+    Array[File] bam
+    Array[File] bai
     String outputFileNamePrefix
     String libtype
   }
 
   parameter_meta {
-    bam: "Input BAM file containing aligned reads"
-    bai: "Index file for BAM"
+    bam: "One or more BAM files for a single sample"
+    bai: "BAM index files (same order as bam)"
     outputFileNamePrefix: "Prefix for output files"
     libtype: "Library type determining HLA reference to use (dna|rna)"
   }
@@ -20,6 +20,7 @@ workflow optitype {
     "rna": "/.mounts/labs/gsi/modulator/sw/Ubuntu20.04/optitype-1.3.1/ref/hla_reference_rna.fasta"
   }
 
+  # Extract chr6 HLA region, handle multiple BAMs, merge inside the task
   call extract_chr6_HLA_region {
     input:
       bam = bam,
@@ -88,17 +89,18 @@ workflow optitype {
 
 task extract_chr6_HLA_region {
   input {
-    File bam
-    File bai
+    Array[File] bam
+    Array[File] bai
     String libtype
     String modules = "samtools/1.9"
     Int jobMemory = 16
     Int timeout = 48
   }
 
+
   parameter_meta {
-    bam: "Input BAM file"
-    bai: "BAM index file"
+    bam: "One or more BAM files for a single sample"
+    bai: "BAM index files (same order as BAM)"
     modules: "Modules to load"
     jobMemory: "Memory allocated (GB)"
     timeout: "Timeout in hours"
@@ -108,36 +110,59 @@ task extract_chr6_HLA_region {
   set -euo pipefail
   module load ~{modules}
 
-  # Extract all contigs starting with chr6 HLA region
-  samtools view -b ~{bam} chr6:29677984-33485635 > chr6_region.bam
+  # Convert input Array[File] to bash arrays
+  bams=(~{sep=' ' bam})
+  bais=(~{sep=' ' bai})
 
-  # Extract chr6 alt reads
-  samtools view -b ~{bam} \
-    chr6_GL000250v2_alt chr6_GL000251v2_alt chr6_GL000252v2_alt \
-    chr6_GL000253v2_alt chr6_GL000254v2_alt chr6_GL000255v2_alt \
-    chr6_GL000256v2_alt chr6_GL383533v1_alt chr6_KB021644v2_alt \
-    chr6_KI270758v1_alt chr6_KI270797v1_alt chr6_KI270798v1_alt \
-    chr6_KI270799v1_alt chr6_KI270800v1_alt chr6_KI270801v1_alt \
-    chr6_KI270802v1_alt chr6_KQ090017v1_alt > chr6_alt.bam
+  # Initialize array to store per-BAM filtered BAMs
+  chr6_bams=()
 
-  # Conditionally extract unmapped reads if libtype is 'rna'
-  if [ "~{libtype}" == "rna" ]; then
-    samtools view -h -b -f 4 ~{bam} > unmapped.bam
-    samtools merge chr6_filter.bam chr6_region.bam chr6_alt.bam unmapped.bam
+  # Loop over each BAM
+  for i in $(seq 0 $((${#bams[@]}-1))); do
+      # Extract chr6 main region
+     samtools view -b "${bams[$i]}" chr6:29677984-33485635 > chr6_region_$i.bam
+
+      # Extract chr6 alt contigs
+      samtools view -b "${bams[$i]}" \
+          chr6_GL000250v2_alt chr6_GL000251v2_alt chr6_GL000252v2_alt \
+          chr6_GL000253v2_alt chr6_GL000254v2_alt chr6_GL000255v2_alt \
+          chr6_GL000256v2_alt chr6_GL383533v1_alt chr6_KB021644v2_alt \
+          chr6_KI270758v1_alt chr6_KI270797v1_alt chr6_KI270798v1_alt \
+          chr6_KI270799v1_alt chr6_KI270800v1_alt chr6_KI270801v1_alt \
+          chr6_KI270802v1_alt chr6_KQ090017v1_alt > chr6_alt_$i.bam
+
+     # Conditionally extract unmapped reads if libtype is 'rna'
+      if [ "~{libtype}" == "rna" ]; then
+          samtools view -h -b -f 4 "${bams[$i]}" > unmapped_$i.bam
+          samtools merge chr6_filtered_$i.bam chr6_region_$i.bam chr6_alt_$i.bam unmapped_$i.bam
+      else
+          samtools merge chr6_filtered_$i.bam chr6_region_$i.bam chr6_alt_$i.bam
+      fi
+
+      # Add to array
+      chr6_bams+=("chr6_filtered_$i.bam")
+  done
+
+  # Merge all filtered BAMs if more than one
+  if [ ${#chr6_bams[@]} -gt 1 ]; then
+      samtools merge -@ 8 chr6_merged.bam "${chr6_bams[@]}"
+     samtools index -@ 8 chr6_merged.bam
   else
-    samtools merge chr6_filter.bam chr6_region.bam chr6_alt.bam
+      cp "${chr6_bams[0]}" chr6_merged.bam
+     samtools index -@ 8 chr6_merged.bam
   fi
 
-  # Sort by read name
-  samtools sort -n -o chr6_filtered.sorted.bam chr6_filter.bam
+  # Sort by read name and convert to FASTQ
+  samtools sort -n -o chr6_merged.sorted.bam chr6_merged.bam
 
   # Convert to paired FASTQ files
-  samtools fastq -1 chr6_R1.fastq -2 chr6_R2.fastq -0 /dev/null -s /dev/null -n chr6_filtered.sorted.bam
+  samtools fastq -1 chr6_R1.fastq -2 chr6_R2.fastq -0 /dev/null -s /dev/null -n chr6_merged.sorted.bam
 
   # gzip fastq files
   gzip -c chr6_R1.fastq > chr6_R1.fastq.gz
   gzip -c chr6_R2.fastq > chr6_R2.fastq.gz
->>>
+
+  >>>
 
   runtime {
     modules: "~{modules}"
@@ -148,6 +173,7 @@ task extract_chr6_HLA_region {
   output {
     File fastqR1 = "chr6_R1.fastq.gz"
     File fastqR2 = "chr6_R2.fastq.gz"
+    File chr6_merged_bam = "chr6_merged.bam"
   }
 }
 
@@ -173,6 +199,7 @@ task HLAReads {
   }
 
   command <<<
+    
     set -euo pipefail
     echo "Starting razers3 at $(date)"
     razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
@@ -180,6 +207,7 @@ task HLAReads {
     echo "razers3 finished at $(date)"
     samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
     samtools bam2fq HLA2_R2.bam > HLA_R2.fastq
+  
   >>>
 
   runtime {
@@ -217,8 +245,10 @@ task run_optitype {
   }
 
   command <<<
+
     module load ~{modules}
     optitype -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
+  
   >>>
 
   runtime {
