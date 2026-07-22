@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-07-21
+### Added
+- [GRD-1182] (https://jira.oicr.on.ca/browse/GRD-1182)
+- New optional `recognitionRate` input on the `HLAReads` task, exposing razers3's
+  `-rr` (recognition rate) flag. 
+
+### Changed
+- Default resources for `HLAReads` (`threads = 4`, `jobMemory = 24`, `timeout = 12`)
+  and `run_optitype` (`jobMemory = 16`, `timeout = 12`).
+
+## [2.1.1] - 2026-01-26
+### Added
+- [GRD-1029] (https://jira.oicr.on.ca/browse/GRD-1029), Support for multiple input BAM/BAM index files (Array[File] bam, Array[File] bai) to handle multi-lane or multi-run samples.
+
 ## [2.1.0] - 2026-01-26
 ### Added
 - [GRD-1029] (https://jira.oicr.on.ca/browse/GRD-1029), Support for multiple input BAM/BAM index files (Array[File] bam, Array[File] bai) to handle multi-lane or multi-run samples.
