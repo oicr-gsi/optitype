@@ -42,13 +42,14 @@ Parameter|Value|Default|Description
 `extract_chr6_HLA_region.modules`|String|"samtools/1.9"|Modules to load
 `extract_chr6_HLA_region.jobMemory`|Int|16|Memory allocated (GB)
 `extract_chr6_HLA_region.timeout`|Int|48|Timeout in hours
+`HLAReads.recognitionRate`|Float?|None|razers3 recognition rate (-rr)
 `HLAReads.modules`|String|"optitype/1.3.1 hla-reference/1.0.0"|Required environment modules
-`HLAReads.threads`|Int|8|Number of threads to use for razers3
+`HLAReads.threads`|Int|4|Number of threads to use for razers3
 `HLAReads.jobMemory`|Int|24|Memory allocated for this job
-`HLAReads.timeout`|Int|72|Hours before task timeout
+`HLAReads.timeout`|Int|12|Hours before task timeout
 `run_optitype.modules`|String|"optitype/1.3.1"|Required environment modules
 `run_optitype.jobMemory`|Int|16|Memory allocated for this job
-`run_optitype.timeout`|Int|48|Hours before task timeout
+`run_optitype.timeout`|Int|12|Hours before task timeout
 
 
 ### Outputs
@@ -127,12 +128,22 @@ Output | Type | Description | Labels
    gzip -c chr6_R1.fastq > chr6_R1.fastq.gz
    gzip -c chr6_R2.fastq > chr6_R2.fastq.gz
  ```
+ 
  ```
   	set -euo pipefail
+ 
+     if [ -z "~{rrFlag}" ]; then
+       echo "NOTE: razers3 running at default -rr 100 (lossless), timeout ~{timeout}h.
+       If this is a high-read-count sample and the job is killed at the timeout,
+       re-run with optitype.HLAReads.recognitionRate = 99.9 (finishes in ~minutes,
+       validated call-equivalent to lossless)." >&2
+     fi
+ 
      echo "Starting razers3 at $(date)"
-     razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
-     razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
+     razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
+     razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
      echo "razers3 finished at $(date)"
+     
      samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
      samtools bam2fq HLA2_R2.bam > HLA_R2.fastq 
  ```

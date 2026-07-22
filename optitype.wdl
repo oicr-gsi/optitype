@@ -188,29 +188,42 @@ task HLAReads {
     File fastqR1
     File fastqR2
     File hlaref
+    Float? recognitionRate
     String modules = "optitype/1.3.1 hla-reference/1.0.0"
-    Int threads = 8
+    Int threads = 4
     Int jobMemory = 24
-    Int timeout = 72
+    Int timeout = 12
   }
 
   parameter_meta {
     fastqR1: "Fastq file read 1"
     fastqR2: "Fastq file read 2"
     hlaref: "hla reference file"
+    recognitionRate: "razers3 recognition rate (-rr)"
     modules: "Required environment modules"
     threads: "Number of threads to use for razers3"
     jobMemory: "Memory allocated for this job"
     timeout: "Hours before task timeout"
   }
 
+  # Build optional flags: empty string when unset
+  String rrFlag = if defined(recognitionRate) then "-rr ~{recognitionRate}" else ""
+
   command <<<
-    
     set -euo pipefail
+
+    if [ -z "~{rrFlag}" ]; then
+      echo "NOTE: razers3 running at default -rr 100 (lossless), timeout ~{timeout}h. 
+      If this is a high-read-count sample and the job is killed at the timeout, 
+      re-run with optitype.HLAReads.recognitionRate = 99.9 (finishes in ~minutes, 
+      validated call-equivalent to lossless)." >&2
+    fi
+    
     echo "Starting razers3 at $(date)"
-    razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
-    razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
+    razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
+    razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
     echo "razers3 finished at $(date)"
+    
     samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
     samtools bam2fq HLA2_R2.bam > HLA_R2.fastq
   
@@ -237,7 +250,7 @@ task run_optitype {
     String libtype
     String modules = "optitype/1.3.1"
     Int jobMemory = 16
-    Int timeout = 48
+    Int timeout = 12
   }
 
   parameter_meta {

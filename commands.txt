@@ -66,12 +66,22 @@
   gzip -c chr6_R1.fastq > chr6_R1.fastq.gz
   gzip -c chr6_R2.fastq > chr6_R2.fastq.gz
 ```
+
 ```
  	set -euo pipefail
+
+    if [ -z "~{rrFlag}" ]; then
+      echo "NOTE: razers3 running at default -rr 100 (lossless), timeout ~{timeout}h.
+      If this is a high-read-count sample and the job is killed at the timeout,
+      re-run with optitype.HLAReads.recognitionRate = 99.9 (finishes in ~minutes,
+      validated call-equivalent to lossless)." >&2
+    fi
+
     echo "Starting razers3 at $(date)"
-    razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
-    razers3 -i 95 -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
+    razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
+    razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
     echo "razers3 finished at $(date)"
+    
     samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
     samtools bam2fq HLA2_R2.bam > HLA_R2.fastq 
 ```

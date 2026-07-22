@@ -29,14 +29,15 @@
       "optitype.extract_chr6_HLA_region.timeout": 48,
       "optitype.extract_chr6_HLA_region.modules": "samtools/1.9",
       "optitype.HLAReads.jobMemory": 24,
-      "optitype.HLAReads.timeout": 72,
-      "optitype.HLAReads.threads": 8,
+      "optitype.HLAReads.timeout": 12,
+      "optitype.HLAReads.threads": 4,
+      "optitype.HLAReads.recognitionRate":null,
       "optitype.HLAReads.modules": "optitype/1.3.1 hla-reference/1.0.0",
       "optitype.run_optitype.jobMemory": 16,
-      "optitype.run_optitype.timeout": 48,
+      "optitype.run_optitype.timeout": 12,
       "optitype.run_optitype.modules": "optitype/1.3.1"
     },
-    "description": "optitype workflow test_WG (v2.0.0)",
+    "description": "optitype workflow test_WG (v2.2.0)",
     "engineArguments": {
       "write_to_cache": false,
       "read_from_cache": false
@@ -64,7 +65,7 @@
       {
         "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
         "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.0.0/workflow_test_01.metrics",
+        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.2.0/workflow_test_01.metrics",
         "type": "script"
       }
     ]
@@ -99,14 +100,15 @@
       "optitype.extract_chr6_HLA_region.timeout": 48,
       "optitype.extract_chr6_HLA_region.modules": "samtools/1.9",
       "optitype.HLAReads.jobMemory": 24,
-      "optitype.HLAReads.timeout": 72,
-      "optitype.HLAReads.threads": 8,
+      "optitype.HLAReads.timeout": 12,
+      "optitype.HLAReads.threads": 4,
+      "optitype.HLAReads.recognitionRate":null,
       "optitype.HLAReads.modules": "optitype/1.3.1 hla-reference/1.0.0",
       "optitype.run_optitype.jobMemory": 16,
-      "optitype.run_optitype.timeout": 48,
+      "optitype.run_optitype.timeout": 12,
       "optitype.run_optitype.modules": "optitype/1.3.1"
     },
-    "description": "optitype workflow test_WT (v2.0.0)",
+    "description": "optitype workflow test_WT (v2.2.0)",
     "engineArguments": {
       "write_to_cache": false,
       "read_from_cache": false
@@ -134,7 +136,7 @@
       {
         "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
         "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.1.0/workflow_test_02.metrics",
+        "output_metrics": "/.mounts/labs/gsi/testdata/optitype/output_metrics/2.2.0/workflow_test_02.metrics",
         "type": "script"
       }
     ]
