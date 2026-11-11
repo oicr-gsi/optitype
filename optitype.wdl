@@ -249,6 +249,8 @@ task run_optitype {
     String prefix
     String libtype
     String modules = "optitype/1.3.1"
+    String containerCommand = "singularity run -B /.mounts/ -B /scratch3/ --pid $OPTITYPE_ROOT/bin/optitype.sif"
+    String singularityTmpDir = "$TMP"
     Int jobMemory = 16
     Int timeout = 12
   }
@@ -264,9 +266,11 @@ task run_optitype {
   }
 
   command <<<
-
+    export SINGULARITY_TMPDIR="~{singularityTmpDir}"
+    
     module load ~{modules}
-    optitype -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
+    
+    ~{containerCommand} -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
   
   >>>
 
