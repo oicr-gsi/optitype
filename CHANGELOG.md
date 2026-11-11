@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-11-11
+### Added
+- [GP-5980] (https://jira.oicr.on.ca/browse/GP-5980)
+- New `containerCommand` input on the `run_optitype` task. It sets the command used to enter the
+  optitype container (default: `singularity run -B /.mounts/ -B /scratch3/ --pid $OPTITYPE_ROOT/bin/optitype.sif`).
+- New `singularityTmpDir` input on the `run_optitype` task (default: `$TMP`). It is exported as
+  `SINGULARITY_TMPDIR`, so the SIF-to-sandbox extraction runs on node-local, exec-enabled disk.
+
 ## [2.2.0] - 2026-07-21
 ### Added
 - [GRD-1182] (https://jira.oicr.on.ca/browse/GRD-1182)

@@ -261,6 +261,8 @@ task run_optitype {
     prefix: "Prefix for output files"
     libtype: "Library type (dna or rna)"
     modules: "Required environment modules"
+    containerCommand: "Command used to enter the optitype container when the optitype module wrapper has no bind mounts, so the image is invoked through singularity directly with the required binds"
+    singularityTmpDir: "Directory singularity extracts the image into. Must be node-local and exec-enabled (not /tmp)"
     jobMemory: "Memory allocated for this job"
     timeout: "Hours before task timeout"
   }
