@@ -1,9 +1,9 @@
 ## Commands
- This section lists command(s) run by Optitype workflow
- 
- * Running Optitype
+This section lists command(s) run by optitype workflow
 
- ```
+* Running optitype
+
+``` 
   set -euo pipefail
   module load ~{modules}
 
@@ -29,8 +29,7 @@
           chr6_KI270802v1_alt chr6_KQ090017v1_alt > chr6_alt_$i.bam
 
      # Conditionally extract unmapped reads if libtype is 'rna'
-
-        # Note:
+      # Note:
         # Unmapped reads are included only for RNA-seq inputs to mitigate the
         # systematic loss of HLA reads during initial genome alignment due to extreme polymorphism and multi-mapping.
         # OptiType performs HLA-aware realignment, making these reads informative
@@ -65,27 +64,32 @@
   # gzip fastq files
   gzip -c chr6_R1.fastq > chr6_R1.fastq.gz
   gzip -c chr6_R2.fastq > chr6_R2.fastq.gz
-```
 
 ```
- 	set -euo pipefail
+```
+    set -euo pipefail
 
     if [ -z "~{rrFlag}" ]; then
-      echo "NOTE: razers3 running at default -rr 100 (lossless), timeout ~{timeout}h.
-      If this is a high-read-count sample and the job is killed at the timeout,
-      re-run with optitype.HLAReads.recognitionRate = 99.9 (finishes in ~minutes,
+      echo "NOTE: razers3 running at default -rr 100 (lossless), timeout ~{timeout}h. 
+      If this is a high-read-count sample and the job is killed at the timeout, 
+      re-run with optitype.HLAReads.recognitionRate = 99.9 (finishes in ~minutes, 
       validated call-equivalent to lossless)." >&2
     fi
-
+    
     echo "Starting razers3 at $(date)"
     razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA1_R1.bam ~{hlaref} ~{fastqR1}
     razers3 -i 95 ~{rrFlag} -tc "~{threads}" -m 1 -dr 0 -o HLA2_R2.bam ~{hlaref} ~{fastqR2}
     echo "razers3 finished at $(date)"
     
     samtools bam2fq HLA1_R1.bam > HLA_R1.fastq
-    samtools bam2fq HLA2_R2.bam > HLA_R2.fastq 
+    samtools bam2fq HLA2_R2.bam > HLA_R2.fastq
+  
 ```
 ```
+    export SINGULARITY_TMPDIR="~{singularityTmpDir}"
+    
     module load ~{modules}
-    optitype -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}	  
+    
+    ~{containerCommand} -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
+  
 ```

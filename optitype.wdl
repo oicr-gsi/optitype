@@ -249,6 +249,8 @@ task run_optitype {
     String prefix
     String libtype
     String modules = "optitype/1.3.1"
+    String containerCommand = "singularity run -B /.mounts/ -B /scratch3/ --pid $OPTITYPE_ROOT/bin/optitype.sif"
+    String singularityTmpDir = "$TMP"
     Int jobMemory = 16
     Int timeout = 12
   }
@@ -259,14 +261,18 @@ task run_optitype {
     prefix: "Prefix for output files"
     libtype: "Library type (dna or rna)"
     modules: "Required environment modules"
+    containerCommand: "Command used to enter the optitype container when the optitype module wrapper has no bind mounts, so the image is invoked through singularity directly with the required binds"
+    singularityTmpDir: "Directory singularity extracts the image into. Must be node-local and exec-enabled (not /tmp)"
     jobMemory: "Memory allocated for this job"
     timeout: "Hours before task timeout"
   }
 
   command <<<
-
+    export SINGULARITY_TMPDIR="~{singularityTmpDir}"
+    
     module load ~{modules}
-    optitype -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
+    
+    ~{containerCommand} -i ~{hlafastq_R1} ~{hlafastq_R2} --~{libtype} -v -o . --prefix ~{prefix}
   
   >>>
 
